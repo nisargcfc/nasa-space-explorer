@@ -371,7 +371,7 @@ const Dashboard = () => {
                     </Box>
                   </Box>
                   <CardContent sx={{ flexGrow: 1 }}>
-                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                    <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mt: 2 }}>
                       <Box>
                         <Typography variant="h6" gutterBottom>
                           Astronomy Picture of the Day
@@ -387,6 +387,7 @@ const Dashboard = () => {
                         variant="contained"
                         endIcon={<ArrowForward />}
                         onClick={() => navigate('/apod')}
+                        sx={{ ml: 2 }}
                       >
                         Explore APOD
                       </Button>
@@ -472,6 +473,7 @@ const Dashboard = () => {
                   variant="outlined"
                   endIcon={<ArrowForward />}
                   onClick={() => navigate('/mars')}
+                  sx={{ ml: 3, flexShrink: 0 }}
                 >
                   View All Photos
                 </Button>
@@ -541,10 +543,10 @@ const Dashboard = () => {
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    outerRadius={80}
+                    outerRadius={70}
                     fill="#8884d8"
                     dataKey="value"
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    label={false}
                   >
                     {roverDistribution.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
@@ -559,6 +561,24 @@ const Dashboard = () => {
                   />
                 </PieChart>
               </ResponsiveContainer>
+              {/* Custom Legend */}
+              <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 1 }}>
+                {roverDistribution.map((entry, index) => (
+                  <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <Box
+                      sx={{
+                        width: 12,
+                        height: 12,
+                        borderRadius: '50%',
+                        backgroundColor: entry.color,
+                      }}
+                    />
+                    <Typography variant="caption">
+                      {entry.name}: {entry.value}%
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
             </Card>
           </motion.div>
         </Grid>

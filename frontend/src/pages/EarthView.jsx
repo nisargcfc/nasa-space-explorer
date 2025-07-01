@@ -51,7 +51,10 @@ const EarthView = () => {
 
   // Format date for API call
   const dateString = format(selectedDate, 'yyyy-MM-dd');
-  const { data: epicImages, loading, error } = useEPIC(dateString);
+  const { data: epicResponse, loading, error } = useEPIC(dateString);
+  
+  // Extract images array from response
+  const epicImages = epicResponse?.images || [];
 
   // Fetch available dates on component mount
   useEffect(() => {

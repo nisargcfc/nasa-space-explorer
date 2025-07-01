@@ -346,32 +346,34 @@ const NEOTracker = () => {
               <Typography variant="h6" gutterBottom>
                 Daily Asteroid Activity
               </Typography>
-              <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={processedData.dailyData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <RechartsTooltip />
-                  <Area
-                    type="monotone"
-                    dataKey="total"
-                    stackId="1"
-                    stroke="#2196f3"
-                    fill="#2196f3"
-                    fillOpacity={0.6}
-                    name="Total Asteroids"
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="hazardous"
-                    stackId="2"
-                    stroke="#f44336"
-                    fill="#f44336"
-                    fillOpacity={0.8}
-                    name="Potentially Hazardous"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+              <Box sx={{ width: '100%', height: 300 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={processedData.dailyData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <RechartsTooltip />
+                    <Area
+                      type="monotone"
+                      dataKey="total"
+                      stackId="1"
+                      stroke="#2196f3"
+                      fill="#2196f3"
+                      fillOpacity={0.6}
+                      name="Total Asteroids"
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="hazardous"
+                      stackId="2"
+                      stroke="#f44336"
+                      fill="#f44336"
+                      fillOpacity={0.8}
+                      name="Potentially Hazardous"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </Box>
             </CardContent>
           </Card>
         </Grid>
@@ -389,18 +391,40 @@ const NEOTracker = () => {
                     data={processedData.hazardData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={60}
-                    outerRadius={100}
+                    innerRadius={40}
+                    outerRadius={80}
                     dataKey="value"
-                    label={({ name, value }) => `${name}: ${value}`}
+                    labelLine={false}
+                    label={false}
                   >
                     {processedData.hazardData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
-                  <RechartsTooltip />
+                  <RechartsTooltip 
+                    formatter={(value, name) => [value, name]}
+                    labelFormatter={() => ''}
+                  />
                 </PieChart>
               </ResponsiveContainer>
+              {/* Custom Legend */}
+              <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 1 }}>
+                {processedData.hazardData.map((entry, index) => (
+                  <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <Box
+                      sx={{
+                        width: 12,
+                        height: 12,
+                        borderRadius: '50%',
+                        backgroundColor: entry.color,
+                      }}
+                    />
+                    <Typography variant="caption">
+                      {entry.name}: {entry.value}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
             </CardContent>
           </Card>
         </Grid>
