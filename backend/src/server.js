@@ -6,6 +6,8 @@ import compression from 'compression';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { rateLimiter } from './middleware/rateLimiter.js';
+import { cacheMiddleware, getCacheStats } from './middleware/cache.js';
 
 // Import routes
 import apodRouter from './routes/apod.js';
@@ -38,6 +40,9 @@ app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 app.use(morgan('dev')); // Log requests
 
+// Add general rate limiting middleware
+app.use(rateLimiter);
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ 
@@ -45,6 +50,26 @@ app.get('/health', (req, res) => {
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV 
   });
+});
+
+// Debug endpoint to check API key (for development only)
+app.get('/debug/api-key', (req, res) => {
+  const apiKey = process.env.NASA_API_KEY || 'DEMO_KEY';
+  res.json({ 
+    apiKey: apiKey.substring(0, 8) + '...',
+    usingDemo: apiKey === 'DEMO_KEY',
+    environment: process.env.NODE_ENV
+  });
+});
+
+// Cache stats endpoint
+app.get('/api/cache/stats', (req, res) => {
+  try {
+    const stats = getCacheStats();
+    res.json(stats);
+  } catch (error) {
+    res.json({ message: 'Cache stats not available', error: error.message });
+  }
 });
 
 // API Routes
@@ -82,7 +107,7 @@ app.listen(PORT, () => {
 🚀 NASA Space Explorer Backend
 📡 Server running on http://localhost:${PORT}
 🌍 Environment: ${process.env.NODE_ENV}
-🔑 NASA API Key: ${process.env.NASA_API_KEY ? 'Configured ✓' : 'Missing ✗'}
+🔑 NASA API Key: ${process.env.NASA_API_KEY ? `Configured ✓ (${process.env.NASA_API_KEY.substring(0, 8)}...)` : 'Missing ✗'}
   `);
 });
 

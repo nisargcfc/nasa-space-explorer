@@ -1,9 +1,20 @@
 import axios from 'axios';
+import { 
+  fallbackAPOD, 
+  fallbackMarsPhotos, 
+  fallbackNEOData, 
+  fallbackEPICData,
+  fallbackSearchResults,
+  isRateLimited 
+} from '../utils/fallbackData.js';
 
 class NASAService {
   constructor() {
     this.apiKey = process.env.NASA_API_KEY || 'DEMO_KEY';
     this.baseURL = 'https://api.nasa.gov';
+    
+    // Debug: Log which API key is being used
+    console.log(`🔑 NASA Service initialized with API key: ${this.apiKey.substring(0, 8)}...`);
     
     // Create axios instance with defaults
     this.client = axios.create({
@@ -45,6 +56,10 @@ class NASAService {
       });
       return response.data;
     } catch (error) {
+      if (isRateLimited(error)) {
+        console.warn('NASA API rate limited, using fallback APOD data');
+        return fallbackAPOD;
+      }
       throw this.handleError(error, 'APOD');
     }
   }
@@ -85,6 +100,10 @@ class NASAService {
       
       return response.data;
     } catch (error) {
+      if (isRateLimited(error)) {
+        console.warn('NASA API rate limited, using fallback Mars photos data');
+        return fallbackMarsPhotos;
+      }
       throw this.handleError(error, 'Mars Photos');
     }
   }
@@ -107,6 +126,17 @@ class NASAService {
   // Near Earth Objects
   async getNEO(startDate, endDate) {
     try {
+      // Calculate the difference in days
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      const diffTime = Math.abs(end - start);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      // NASA NEO API has a 7-day maximum range
+      if (diffDays > 7) {
+        throw new Error('Date range cannot exceed 7 days');
+      }
+      
       const response = await this.client.get('/neo/rest/v1/feed', {
         params: {
           api_key: this.apiKey,
@@ -117,6 +147,10 @@ class NASAService {
       });
       return response.data;
     } catch (error) {
+      if (isRateLimited(error)) {
+        console.warn('NASA API rate limited, using fallback NEO data');
+        return fallbackNEOData;
+      }
       throw this.handleError(error, 'NEO');
     }
   }
@@ -155,6 +189,10 @@ class NASAService {
       
       return data;
     } catch (error) {
+      if (isRateLimited(error)) {
+        console.warn('NASA API rate limited, using fallback EPIC data');
+        return fallbackEPICData.images;
+      }
       throw this.handleError(error, 'EPIC');
     }
   }
@@ -163,6 +201,37 @@ class NASAService {
   getEPICImageURL(date, imageName) {
     const [year, month, day] = date.split(' ')[0].split('-');
     return `https://api.nasa.gov/EPIC/archive/natural/${year}/${month}/${day}/png/${imageName}.png?api_key=${this.apiKey}`;
+  }
+
+  // Get available EPIC dates
+  async getEPICDates() {
+    try {
+      const response = await this.client.get('/EPIC/api/natural/all', {
+        params: { api_key: this.apiKey }
+      });
+      
+      // Process dates and return most recent ones
+      const dates = response.data || [];
+      return dates.slice(0, 50).map(item => ({
+        date: item.date.split(' ')[0], // Extract just the date part
+        caption: `${item.image_count || 1} images available`
+      }));
+    } catch (error) {
+      // Fallback to recent dates if API fails
+      const fallbackDates = [];
+      const today = new Date();
+      
+      for (let i = 0; i < 30; i++) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        fallbackDates.push({
+          date: date.toISOString().split('T')[0],
+          caption: `Historical data`
+        });
+      }
+      
+      return fallbackDates;
+    }
   }
 
   // NASA Image and Video Library Search

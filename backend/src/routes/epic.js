@@ -1,10 +1,11 @@
 import express from 'express';
 import nasaService from '../services/nasaService.js';
+import { cacheMiddleware } from '../middleware/cache.js';
 
 const router = express.Router();
 
 // Get latest EPIC images
-router.get('/', async (req, res, next) => {
+router.get('/', cacheMiddleware('epic'), async (req, res, next) => {
   try {
     const { date } = req.query;
     
@@ -37,18 +38,11 @@ router.get('/', async (req, res, next) => {
   }
 });
 
-// Get available dates for EPIC images
-router.get('/dates', async (req, res, next) => {
+// Get available dates for EPIC images (with cache)
+router.get('/dates', cacheMiddleware('epic'), async (req, res, next) => {
   try {
-    // This endpoint would typically fetch available dates
-    // For now, we'll return information about EPIC
-    res.json({
-      info: 'EPIC provides daily images of Earth since 2015',
-      first_available: '2015-09-01',
-      update_frequency: 'Daily (when operational)',
-      typical_images_per_day: '12-24',
-      note: 'Use /api/epic?date=YYYY-MM-DD to get images for a specific date'
-    });
+    const data = await nasaService.getEPICDates();
+    res.json(data);
   } catch (error) {
     next(error);
   }

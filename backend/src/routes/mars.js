@@ -1,10 +1,11 @@
 import express from 'express';
 import nasaService from '../services/nasaService.js';
+import { cacheMiddleware } from '../middleware/cache.js';
 
 const router = express.Router();
 
 // Get Mars rover photos
-router.get('/', async (req, res, next) => {
+router.get('/', cacheMiddleware('mars'), async (req, res, next) => {
   try {
     const { 
       sol = 1000, 
@@ -50,7 +51,7 @@ router.get('/', async (req, res, next) => {
 });
 
 // Get rover manifest (mission details and available sols)
-router.get('/manifest/:rover', async (req, res, next) => {
+router.get('/manifest/:rover', cacheMiddleware('mars'), async (req, res, next) => {
   try {
     const { rover } = req.params;
     
@@ -68,7 +69,7 @@ router.get('/manifest/:rover', async (req, res, next) => {
   }
 });
 
-// Get available cameras for a rover
+// Get available cameras for a rover (no cache)
 router.get('/cameras/:rover', async (req, res, next) => {
   try {
     const { rover } = req.params;

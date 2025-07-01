@@ -1,10 +1,11 @@
 import express from 'express';
 import nasaService from '../services/nasaService.js';
+import { cacheMiddleware } from '../middleware/cache.js';
 
 const router = express.Router();
 
 // Get Near Earth Objects for a date range
-router.get('/', async (req, res, next) => {
+router.get('/', cacheMiddleware('neo'), async (req, res, next) => {
   try {
     const { start_date, end_date } = req.query;
     
@@ -109,7 +110,7 @@ router.get('/', async (req, res, next) => {
 });
 
 // Get details for a specific asteroid
-router.get('/:asteroidId', async (req, res, next) => {
+router.get('/:asteroidId', cacheMiddleware('neo'), async (req, res, next) => {
   try {
     const { asteroidId } = req.params;
     

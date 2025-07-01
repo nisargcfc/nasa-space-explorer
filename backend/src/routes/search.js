@@ -1,10 +1,11 @@
 import express from 'express';
 import nasaService from '../services/nasaService.js';
+import { cacheMiddleware } from '../middleware/cache.js';
 
 const router = express.Router();
 
 // Search NASA Image and Video Library
-router.get('/', async (req, res, next) => {
+router.get('/', cacheMiddleware('search'), async (req, res, next) => {
   try {
     const { 
       q, 
@@ -67,7 +68,7 @@ router.get('/', async (req, res, next) => {
 });
 
 // Get asset details for a specific NASA ID
-router.get('/asset/:nasaId', async (req, res, next) => {
+router.get('/asset/:nasaId', cacheMiddleware('search'), async (req, res, next) => {
   try {
     const { nasaId } = req.params;
     

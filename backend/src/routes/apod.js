@@ -1,10 +1,11 @@
 import express from 'express';
 import nasaService from '../services/nasaService.js';
+import { cacheMiddleware } from '../middleware/cache.js';
 
 const router = express.Router();
 
 // Get APOD for a specific date
-router.get('/', async (req, res, next) => {
+router.get('/', cacheMiddleware('apod'), async (req, res, next) => {
   try {
     const { date } = req.query;
     
@@ -23,7 +24,7 @@ router.get('/', async (req, res, next) => {
 });
 
 // Get APOD for a date range
-router.get('/range', async (req, res, next) => {
+router.get('/range', cacheMiddleware('apod'), async (req, res, next) => {
   try {
     const { start_date, end_date } = req.query;
     
