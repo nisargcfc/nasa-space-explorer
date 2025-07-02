@@ -33,6 +33,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { format, addDays, subDays, startOfMonth, endOfMonth, eachDayOfInterval, isAfter } from 'date-fns';
 import { useAPOD } from '../hooks/useNASAData';
 import { nasaAPI } from '../services/api';
+import FallbackNotice from '../components/common/FallbackNotice';
 
 const APODExplorer = () => {
   // Set default date to today's date to match Dashboard
@@ -40,6 +41,7 @@ const APODExplorer = () => {
   const [fullscreenOpen, setFullscreenOpen] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [favorites, setFavorites] = useState([]);
+  const [usingFallbackData, setUsingFallbackData] = useState(false);
   
   const { data: apodData, loading, error } = useAPOD(format(selectedDate, 'yyyy-MM-dd'));
 
@@ -50,6 +52,11 @@ const APODExplorer = () => {
       setFavorites(JSON.parse(saved));
     }
   }, []);
+
+  useEffect(() => {
+    // Check for fallback data
+    setUsingFallbackData(apodData?._isFallbackData || false);
+  }, [apodData]);
 
   const toggleFavorite = () => {
     if (!apodData) return;
@@ -244,6 +251,9 @@ const APODExplorer = () => {
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
       <CalendarView />
+      
+      {/* Fallback Notice */}
+      <FallbackNotice show={usingFallbackData} />
       
       {/* Header */}
       <motion.div

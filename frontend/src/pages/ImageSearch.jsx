@@ -188,9 +188,8 @@ const ImageSearch = () => {
                   >
                     <Box sx={{ position: 'relative' }}>
                       <CardMedia
-                        component={item.media_type === 'video' ? 'video' : 'img'}
+                        component="img"
                         height="200"
-                        image={item.thumbnail}
                         src={item.thumbnail}
                         alt={item.title}
                         sx={{ objectFit: 'cover' }}

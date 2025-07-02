@@ -35,6 +35,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
 import { useMarsPhotos } from '../hooks/useNASAData';
 import { nasaAPI } from '../services/api';
+import FallbackNotice from '../components/common/FallbackNotice';
 
 const MarsGallery = () => {
   const [sol, setSol] = useState(1000);
@@ -45,6 +46,7 @@ const MarsGallery = () => {
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [viewMode, setViewMode] = useState('grid');
   const [roverManifest, setRoverManifest] = useState(null);
+  const [usingFallbackData, setUsingFallbackData] = useState(false);
 
   const { data, loading } = useMarsPhotos(sol, selectedCamera || null, selectedRover, page);
 
@@ -94,6 +96,11 @@ const MarsGallery = () => {
     }
   }, [data, page]);
 
+  useEffect(() => {
+    // Check for fallback data
+    setUsingFallbackData(data?._isFallbackData || false);
+  }, [data]);
+
   const handleFilterChange = () => {
     setPage(1);
     setAllPhotos([]);
@@ -122,6 +129,9 @@ const MarsGallery = () => {
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+      {/* Fallback Notice */}
+      <FallbackNotice show={usingFallbackData} />
+      
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}

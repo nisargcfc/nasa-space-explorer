@@ -63,12 +63,14 @@ import {
 } from 'recharts';
 import { format, subDays, addDays } from 'date-fns';
 import { useNEO } from '../hooks/useNASAData';
+import FallbackNotice from '../components/common/FallbackNotice';
 
 const NEOTracker = () => {
   const [selectedAsteroid, setSelectedAsteroid] = useState(null);
   const [timeRange, setTimeRange] = useState(7); // days
   const [viewMode, setViewMode] = useState('grid');
   const [hazardFilter, setHazardFilter] = useState('all'); // all, hazardous, safe
+  const [usingFallbackData, setUsingFallbackData] = useState(false);
 
   // Calculate date range (NASA NEO API limited to 7 days max)
   const today = new Date();
@@ -79,6 +81,11 @@ const NEOTracker = () => {
     format(startDate, 'yyyy-MM-dd'),
     format(endDate, 'yyyy-MM-dd')
   );
+
+  useEffect(() => {
+    // Check for fallback data
+    setUsingFallbackData(neoData?._isFallbackData || false);
+  }, [neoData]);
 
   // Process NEO data for visualizations
   const processedData = React.useMemo(() => {
@@ -281,6 +288,9 @@ const NEOTracker = () => {
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+      {/* Fallback Notice */}
+      <FallbackNotice show={usingFallbackData} />
+      
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
