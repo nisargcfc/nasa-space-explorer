@@ -29,14 +29,16 @@ const PORT = process.env.PORT || 5001;
 // Middleware
 app.use(helmet()); // Security headers
 
-// Simplified CORS configuration for Railway deployment
+// CORS configuration for Render deployment
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5173', 
   'https://nasa-space-explorer-frontend.vercel.app',
   'https://nasa-space-explorer-frontend-6p47x1aod.vercel.app',
   'https://nasa-space-explorer-frontend-cyh0rsjui.vercel.app',
-  'https://nasa-space-explorer-frontend-ibtdt9vmp.vercel.app'
+  'https://nasa-space-explorer-frontend-ibtdt9vmp.vercel.app',
+  'https://nasa-space-explorer-frontend-3c1l88p6b.vercel.app',
+  'https://nasa-space-explorer-frontend-foltbfulp.vercel.app'
 ];
 
 app.use(cors({
