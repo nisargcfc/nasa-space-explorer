@@ -1,12 +1,11 @@
 import NodeCache from 'node-cache';
 
-// Create cache instances with different TTLs
+// In-memory cache instances for different API endpoints
 const caches = {
   apod: new NodeCache({ stdTTL: 3600 }), // 1 hour
-  mars: new NodeCache({ stdTTL: 1800 }), // 30 minutes
-  neo: new NodeCache({ stdTTL: 900 }),   // 15 minutes
-  epic: new NodeCache({ stdTTL: 3600 }), // 1 hour
-  search: new NodeCache({ stdTTL: 600 }) // 10 minutes
+  mars: new NodeCache({ stdTTL: 7200 }), // 2 hours  
+  neo: new NodeCache({ stdTTL: 3600 }), // 1 hour
+  search: new NodeCache({ stdTTL: 7200 }), // 2 hours
 };
 
 // Cache middleware factory

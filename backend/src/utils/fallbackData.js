@@ -1,14 +1,105 @@
 // Fallback data for when NASA APIs are rate-limited or unavailable
 
-export const fallbackAPOD = {
-  date: "2024-06-15",
-  explanation: "This colorized and digitally sharpened image of the Sun is composed of frames recording emission from hydrogen atoms in the solar chromosphere on June 15, 2024. A dark, serpentine filament snakes across the bright solar disk in this stunning view of solar cycle 25 activity.",
-  hdurl: "https://apod.nasa.gov/apod/image/2406/Sun_Meunier_4000.jpg",
-  media_type: "image",
-  service_version: "v1",
-  title: "A Prominent Solar Filament",
-  url: "https://apod.nasa.gov/apod/image/2406/Sun_Meunier_1024.jpg"
+// Multiple APOD fallback entries for different dates
+export const fallbackAPODCollection = {
+  "2025-07-01": {
+    date: "2025-07-01",
+    explanation: "This colorized and digitally sharpened image of the Sun is composed of frames recording emission from hydrogen atoms in the solar chromosphere. A dark, serpentine filament snakes across the bright solar disk in this stunning view of solar cycle 25 activity.",
+    hdurl: "https://apod.nasa.gov/apod/image/2406/Sun_Meunier_4000.jpg",
+    media_type: "image",
+    service_version: "v1",
+    title: "A Prominent Solar Filament",
+    url: "https://apod.nasa.gov/apod/image/2406/Sun_Meunier_1024.jpg"
+  },
+  "2025-06-30": {
+    date: "2025-06-30",
+    explanation: "This stunning view shows the International Space Station silhouetted against the Sun during a solar transit. The entire transit event lasted less than a second, but this single frame captures the moment when the ISS appeared as a dark spot against our star.",
+    hdurl: "https://apod.nasa.gov/apod/image/2306/IssTransitSun_Vantuyne_2048.jpg",
+    media_type: "image",
+    service_version: "v1",
+    title: "International Space Station Transits the Sun",
+    url: "https://apod.nasa.gov/apod/image/2306/IssTransitSun_Vantuyne_1024.jpg"
+  },
+  "2025-06-29": {
+    date: "2025-06-29",
+    explanation: "What created this unusual planetary nebula? NGC 7027 is one of the smallest, brightest, and most unusual planetary nebulae known. The central white dwarf star is surrounded by shells of gas expelled during its final evolutionary stages.",
+    hdurl: "https://apod.nasa.gov/apod/image/2305/ngc7027_hubble_2048.jpg",
+    media_type: "image",
+    service_version: "v1",
+    title: "Planetary Nebula NGC 7027",
+    url: "https://apod.nasa.gov/apod/image/2305/ngc7027_hubble_1024.jpg"
+  },
+  "2025-06-28": {
+    date: "2025-06-28",
+    explanation: "The Andromeda Galaxy is the nearest major galaxy to our Milky Way. This deep image shows Andromeda's spiral structure along with two prominent satellite galaxies. Also known as M31, the Andromeda Galaxy is located about 2.5 million light-years away.",
+    hdurl: "https://apod.nasa.gov/apod/image/2405/M31_Dyer_4096.jpg", 
+    media_type: "image",
+    service_version: "v1",
+    title: "The Andromeda Galaxy",
+    url: "https://apod.nasa.gov/apod/image/2405/M31_Dyer_1024.jpg"
+  },
+  "2025-06-27": {
+    date: "2025-06-27",
+    explanation: "This spectacular aurora was photographed from the International Space Station as it orbited high above the Earth. The dancing lights of the aurora are caused by charged particles from the Sun interacting with Earth's magnetic field and atmosphere.",
+    hdurl: "https://apod.nasa.gov/apod/image/2304/aurora_iss_4096.jpg",
+    media_type: "image", 
+    service_version: "v1",
+    title: "Aurora from the Space Station",
+    url: "https://apod.nasa.gov/apod/image/2304/aurora_iss_1024.jpg"
+  },
+  "2025-06-26": {
+    date: "2025-06-26",
+    explanation: "The Eagle Nebula is a star-forming region located about 7,000 light-years away in the constellation Serpens. This iconic nebula contains the famous 'Pillars of Creation' - towering columns of gas and dust where new stars are being born.",
+    hdurl: "https://apod.nasa.gov/apod/image/2304/eagle_nebula_hst_4096.jpg",
+    media_type: "image",
+    service_version: "v1", 
+    title: "The Eagle Nebula",
+    url: "https://apod.nasa.gov/apod/image/2304/eagle_nebula_hst_1024.jpg"
+  },
+  "2025-06-25": {
+    date: "2025-06-25",
+    explanation: "Saturn's largest moon Titan has a thick atmosphere and lakes of liquid methane. This infrared image from the Cassini spacecraft reveals the moon's surface features through its hazy atmosphere, showing a world both alien and fascinating.",
+    hdurl: "https://apod.nasa.gov/apod/image/2303/titan_cassini_4096.jpg",
+    media_type: "image",
+    service_version: "v1",
+    title: "Titan: Saturn's Largest Moon", 
+    url: "https://apod.nasa.gov/apod/image/2303/titan_cassini_1024.jpg"
+  }
 };
+
+// Get fallback APOD for a specific date or closest available
+export const getFallbackAPOD = (requestedDate) => {
+  if (!requestedDate) {
+    // Return today's date or latest available
+    const today = new Date().toISOString().split('T')[0];
+    return fallbackAPODCollection[today] || fallbackAPODCollection["2025-07-01"];
+  }
+  
+  // Check if we have exact date
+  if (fallbackAPODCollection[requestedDate]) {
+    return fallbackAPODCollection[requestedDate];
+  }
+  
+  // Find closest available date
+  const availableDates = Object.keys(fallbackAPODCollection).sort();
+  const requestedTime = new Date(requestedDate).getTime();
+  
+  let closestDate = availableDates[0];
+  let smallestDiff = Math.abs(new Date(closestDate).getTime() - requestedTime);
+  
+  for (const date of availableDates) {
+    const diff = Math.abs(new Date(date).getTime() - requestedTime);
+    if (diff < smallestDiff) {
+      smallestDiff = diff;
+      closestDate = date;
+    }
+  }
+  
+  return fallbackAPODCollection[closestDate];
+};
+
+// Legacy single fallback for backward compatibility
+export const fallbackAPOD = fallbackAPODCollection["2025-07-01"];
 
 export const fallbackMarsPhotos = {
   photos: [
@@ -112,16 +203,6 @@ export const fallbackNEOData = {
   }
 };
 
-export const fallbackEPICData = {
-  images: [
-    {
-      image: "epic_1b_20240615001633",
-      date: "2024-06-15 00:16:33",
-      image_url: "https://epic.gsfc.nasa.gov/archive/natural/2024/06/15/png/epic_1b_20240615001633.png"
-    }
-  ]
-};
-
 export const fallbackSearchResults = {
   collection: {
     version: "1.0",
@@ -145,6 +226,26 @@ export const fallbackSearchResults = {
             render: "image"
           }
         ]
+      }
+    ]
+  }
+};
+
+export const fallbackRoverManifest = {
+  photo_manifest: {
+    name: "Curiosity",
+    landing_date: "2012-08-06",
+    launch_date: "2011-11-26",
+    status: "active",
+    max_sol: 4000,
+    max_date: "2024-06-15",
+    total_photos: 695000,
+    photos: [
+      {
+        sol: 1000,
+        earth_date: "2015-05-30",
+        total_photos: 45,
+        cameras: ["FHAZ", "RHAZ", "MAST", "CHEMCAM", "MAHLI", "MARDI", "NAVCAM"]
       }
     ]
   }

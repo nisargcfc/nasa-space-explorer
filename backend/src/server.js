@@ -13,7 +13,6 @@ import { cacheMiddleware, getCacheStats } from './middleware/cache.js';
 import apodRouter from './routes/apod.js';
 import marsRouter from './routes/mars.js';
 import neoRouter from './routes/neo.js';
-import epicRouter from './routes/epic.js';
 import searchRouter from './routes/search.js';
 
 // Configure environment variables
@@ -30,9 +29,14 @@ const PORT = process.env.PORT || 5001;
 // Middleware
 app.use(helmet()); // Security headers
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? process.env.FRONTEND_URL 
-    : ['http://localhost:3000', 'http://localhost:5173'],
+  origin: [
+    'http://localhost:3000', 
+    'http://localhost:5173',
+    'https://nasa-space-explorer-frontend.vercel.app',
+    'https://nasa-space-explorer-frontend-6p47x1aod.vercel.app',
+    'https://nasa-space-explorer-frontend-cyh0rsjui.vercel.app',
+    process.env.FRONTEND_URL
+  ].filter(Boolean),
   credentials: true
 }));
 app.use(compression()); // Compress responses
@@ -76,7 +80,6 @@ app.get('/api/cache/stats', (req, res) => {
 app.use('/api/apod', apodRouter);
 app.use('/api/mars', marsRouter);
 app.use('/api/neo', neoRouter);
-app.use('/api/epic', epicRouter);
 app.use('/api/search', searchRouter);
 
 // 404 handler

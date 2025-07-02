@@ -3,9 +3,10 @@ import {
   fallbackAPOD, 
   fallbackMarsPhotos, 
   fallbackNEOData, 
-  fallbackEPICData,
   fallbackSearchResults,
-  isRateLimited 
+  fallbackRoverManifest,
+  isRateLimited,
+  getFallbackAPOD
 } from '../utils/fallbackData.js';
 
 class NASAService {
@@ -58,7 +59,8 @@ class NASAService {
     } catch (error) {
       if (isRateLimited(error)) {
         console.warn('NASA API rate limited, using fallback APOD data');
-        return fallbackAPOD;
+        const fallbackData = getFallbackAPOD(date);
+        return { ...fallbackData, _isFallbackData: true };
       }
       throw this.handleError(error, 'APOD');
     }
@@ -77,6 +79,22 @@ class NASAService {
       });
       return response.data;
     } catch (error) {
+      if (isRateLimited(error)) {
+        console.warn('NASA API rate limited, using fallback APOD range data');
+        
+        // Generate fallback data for the requested date range
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const fallbackArray = [];
+        
+        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+          const dateStr = d.toISOString().split('T')[0];
+          const fallbackData = getFallbackAPOD(dateStr);
+          fallbackArray.push({ ...fallbackData, _isFallbackData: true });
+        }
+        
+        return fallbackArray;
+      }
       throw this.handleError(error, 'APOD Range');
     }
   }
@@ -102,7 +120,7 @@ class NASAService {
     } catch (error) {
       if (isRateLimited(error)) {
         console.warn('NASA API rate limited, using fallback Mars photos data');
-        return fallbackMarsPhotos;
+        return { ...fallbackMarsPhotos, _isFallbackData: true };
       }
       throw this.handleError(error, 'Mars Photos');
     }
@@ -119,6 +137,10 @@ class NASAService {
       );
       return response.data;
     } catch (error) {
+      if (isRateLimited(error)) {
+        console.warn('NASA API rate limited, using fallback rover manifest data');
+        return { ...fallbackRoverManifest, _isFallbackData: true };
+      }
       throw this.handleError(error, 'Rover Manifest');
     }
   }
@@ -149,7 +171,7 @@ class NASAService {
     } catch (error) {
       if (isRateLimited(error)) {
         console.warn('NASA API rate limited, using fallback NEO data');
-        return fallbackNEOData;
+        return { ...fallbackNEOData, _isFallbackData: true };
       }
       throw this.handleError(error, 'NEO');
     }
@@ -164,73 +186,6 @@ class NASAService {
       return response.data;
     } catch (error) {
       throw this.handleError(error, 'Asteroid Details');
-    }
-  }
-
-  // Earth Polychromatic Imaging Camera
-  async getEPIC(date = null) {
-    try {
-      const endpoint = date 
-        ? `/EPIC/api/natural/date/${date}`
-        : '/EPIC/api/natural';
-        
-      const response = await this.client.get(endpoint, {
-        params: { api_key: this.apiKey }
-      });
-      
-      // Add full image URLs to each item
-      const data = response.data;
-      if (Array.isArray(data) && data.length > 0) {
-        return data.map(item => ({
-          ...item,
-          image_url: this.getEPICImageURL(item.date, item.image)
-        }));
-      }
-      
-      return data;
-    } catch (error) {
-      if (isRateLimited(error)) {
-        console.warn('NASA API rate limited, using fallback EPIC data');
-        return fallbackEPICData.images;
-      }
-      throw this.handleError(error, 'EPIC');
-    }
-  }
-
-  // Helper to construct EPIC image URLs
-  getEPICImageURL(date, imageName) {
-    const [year, month, day] = date.split(' ')[0].split('-');
-    return `https://api.nasa.gov/EPIC/archive/natural/${year}/${month}/${day}/png/${imageName}.png?api_key=${this.apiKey}`;
-  }
-
-  // Get available EPIC dates
-  async getEPICDates() {
-    try {
-      const response = await this.client.get('/EPIC/api/natural/all', {
-        params: { api_key: this.apiKey }
-      });
-      
-      // Process dates and return most recent ones
-      const dates = response.data || [];
-      return dates.slice(0, 50).map(item => ({
-        date: item.date.split(' ')[0], // Extract just the date part
-        caption: `${item.image_count || 1} images available`
-      }));
-    } catch (error) {
-      // Fallback to recent dates if API fails
-      const fallbackDates = [];
-      const today = new Date();
-      
-      for (let i = 0; i < 30; i++) {
-        const date = new Date(today);
-        date.setDate(date.getDate() - i);
-        fallbackDates.push({
-          date: date.toISOString().split('T')[0],
-          caption: `Historical data`
-        });
-      }
-      
-      return fallbackDates;
     }
   }
 

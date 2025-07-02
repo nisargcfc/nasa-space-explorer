@@ -42,6 +42,22 @@ router.get('/range', cacheMiddleware('apod'), async (req, res, next) => {
       });
     }
     
+    // Basic validation - let NASA API handle detailed date validation
+    const minDate = '1995-06-16'; // APOD started June 16, 1995
+    
+    if (start_date < minDate) {
+      return res.status(400).json({
+        error: `Start date cannot be before ${minDate} (when APOD started)`
+      });
+    }
+    
+    // Validate start_date <= end_date
+    if (start_date > end_date) {
+      return res.status(400).json({
+        error: 'Start date must be before or equal to end date'
+      });
+    }
+    
     const data = await nasaService.getAPODRange(start_date, end_date);
     res.json(data);
   } catch (error) {
