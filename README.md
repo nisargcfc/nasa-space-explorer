@@ -47,7 +47,7 @@ A comprehensive full-stack application showcasing modern web development through
 ## 🌟 Application Features
 
 ### 📊 **Dashboard - Space Data Command Center**
-![Dashboard](screenshot-placeholder)
+![Dashboard Screenshot](https://github.com/user-attachments/assets/e519f8cb-49d2-4875-8d9c-969d5822f564)
 - **Real-time Overview**: Live statistics of Mars photos, active rovers, and Near Earth Objects
 - **Interactive Charts**: NEO activity tracking with beautiful visualizations
 - **Featured Content**: Today's Astronomy Picture of the Day with exploration options
@@ -55,7 +55,7 @@ A comprehensive full-stack application showcasing modern web development through
 - **Live Data Indicators**: Shows when real NASA data vs. demo data is displayed
 
 ### 🌌 **Astronomy Picture of the Day (APOD)**
-![APOD Explorer](screenshot-placeholder)
+![APOD Screenshot](https://github.com/user-attachments/assets/83c119b6-dedb-4416-8978-99d1e4560164)
 - **Daily Space Photography**: Stunning NASA astronomical images and videos
 - **Interactive Calendar**: Browse any date since June 16, 1995
 - **Smart Navigation**: Previous/Next day controls with date validation  
@@ -71,7 +71,7 @@ A comprehensive full-stack application showcasing modern web development through
 - **Responsive Grid**: Beautiful photo gallery with lightbox viewing
 
 ### ☄️ **Near Earth Object (NEO) Tracker**
-![NEO Tracker](screenshot-placeholder)
+![NEO Tracker Screenshot](https://github.com/user-attachments/assets/8876824f-d574-467e-b68d-f288a1a7f4e3)
 - **Asteroid Monitoring**: Track asteroids approaching Earth in real-time
 - **Risk Assessment**: Visual danger level indicators and classifications
 - **Comprehensive Data**: Size, velocity, distance, and orbital information
