@@ -58,18 +58,16 @@ export const nasaAPI = {
   getRoverManifest: (rover) => API.get(`/mars/manifest/${rover}`),
   getRoverCameras: (rover) => API.get(`/mars/cameras/${rover}`),
   
-  // NEO endpoints
-  getNEO: (startDate, endDate) => 
-    API.get('/neo', { params: { start_date: startDate, end_date: endDate } }),
+  // NEO (Near Earth Objects) endpoints
+  getNEO: (startDate, endDate) => API.get('/neo', { 
+    params: { start_date: startDate, end_date: endDate } 
+  }),
   getAsteroidDetails: (asteroidId) => API.get(`/neo/${asteroidId}`),
   
-  // EPIC endpoints
-  getEPIC: (date) => API.get('/epic', { params: { date } }),
-  getEPICDates: () => API.get('/epic/dates'),
-  
   // Search endpoints
-  searchImages: (query, mediaType = 'image', page = 1) => 
-    API.get('/search', { params: { q: query, media_type: mediaType, page } }),
+  searchImages: (query, page = 1) => API.get('/search', { 
+    params: { q: query, media_type: 'image', page } 
+  }),
   getImageAssets: (nasaId) => API.get(`/search/asset/${nasaId}`),
 };
 

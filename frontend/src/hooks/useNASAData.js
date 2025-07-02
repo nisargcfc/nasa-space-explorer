@@ -62,11 +62,6 @@ export const useNEO = (startDate, endDate) => {
   return useNASAData(() => nasaAPI.getNEO(startDate, endDate), [startDate, endDate]);
 };
 
-// EPIC Hook
-export const useEPIC = (date = null) => {
-  return useNASAData(() => nasaAPI.getEPIC(date), [date]);
-};
-
 // Search Hook with debouncing
 export const useSearch = (query, mediaType = 'image', page = 1, delay = 500) => {
   const [data, setData] = useState(null);

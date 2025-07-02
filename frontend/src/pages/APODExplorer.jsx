@@ -35,8 +35,8 @@ import { useAPOD } from '../hooks/useNASAData';
 import { nasaAPI } from '../services/api';
 
 const APODExplorer = () => {
-  // Set default date to yesterday to avoid today's APOD not being available yet
-  const [selectedDate, setSelectedDate] = useState(subDays(new Date(), 1));
+  // Set default date to today's date to match Dashboard
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [fullscreenOpen, setFullscreenOpen] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [favorites, setFavorites] = useState([]);
@@ -121,20 +121,31 @@ const APODExplorer = () => {
       // Fetch thumbnails for the month
       const fetchMonthData = async () => {
         try {
-          const response = await nasaAPI.getAPODRange(
-            format(monthStart, 'yyyy-MM-dd'),
-            format(monthEnd, 'yyyy-MM-dd')
-          );
-          const dataMap = {};
-          response.data.forEach(apod => {
-            dataMap[apod.date] = apod;
-          });
-          setMonthAPODs(dataMap);
+          // Don't fetch future dates - cap the end date to today
+          const today = new Date();
+          const actualEnd = monthEnd > today ? today : monthEnd;
+          
+          // Only fetch if we have valid date range
+          if (monthStart <= actualEnd) {
+            const response = await nasaAPI.getAPODRange(
+              format(monthStart, 'yyyy-MM-dd'),
+              format(actualEnd, 'yyyy-MM-dd')
+            );
+            const dataMap = {};
+            response.data.forEach(apod => {
+              dataMap[apod.date] = apod;
+            });
+            setMonthAPODs(dataMap);
+          }
         } catch (error) {
           console.error('Error fetching month data:', error);
+          // Don't spam the API on errors
         }
       };
-      fetchMonthData();
+      
+      // Add a small delay to prevent rapid API calls when navigating months
+      const timeoutId = setTimeout(fetchMonthData, 300);
+      return () => clearTimeout(timeoutId);
     }, [selectedDate]);
 
     return (

@@ -14,7 +14,6 @@ import Dashboard from './pages/Dashboard';
 import APODExplorer from './pages/APODExplorer';
 import MarsGallery from './pages/MarsGallery';
 import NEOTracker from './pages/NEOTracker';
-import EarthView from './pages/EarthView';
 import ImageSearch from './pages/ImageSearch';
 
 // Create dark theme for space aesthetic
@@ -113,7 +112,6 @@ function App() {
                   <Route path="/apod" element={<APODExplorer />} />
                   <Route path="/mars" element={<MarsGallery />} />
                   <Route path="/neo" element={<NEOTracker />} />
-                  <Route path="/earth" element={<EarthView />} />
                   <Route path="/search" element={<ImageSearch />} />
                 </Routes>
               </main>

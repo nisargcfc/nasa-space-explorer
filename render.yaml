@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: nasa-space-explorer-backend
+    env: node
+    plan: free
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: NASA_API_KEY
+        value: 3aOkPk5oAbh4ALrRv86kyutLDZ26Fj0XcBWwuT2V 

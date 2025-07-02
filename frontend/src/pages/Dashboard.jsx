@@ -64,7 +64,7 @@ const Dashboard = () => {
     apod: null,
     marsPhotos: [],
     neoData: null,
-    epicImages: [],
+
     stats: {
       totalImages: 0,
       activeRovers: 3,
@@ -86,14 +86,13 @@ const Dashboard = () => {
       const daysAgo = subDays(today, 3); // Use 3 days to stay within API limits
       
       // Fetch all data in parallel
-      const [apodRes, marsRes, neoRes, epicRes] = await Promise.allSettled([
+      const [apodRes, marsRes, neoRes] = await Promise.allSettled([
         nasaAPI.getAPOD(),
         nasaAPI.getMarsPhotos({ sol: 1000, page: 1 }),
         nasaAPI.getNEO(
           format(daysAgo, 'yyyy-MM-dd'),
           format(today, 'yyyy-MM-dd')
         ),
-        nasaAPI.getEPIC(),
       ]);
 
       // Process results with better error handling
@@ -101,7 +100,6 @@ const Dashboard = () => {
         apod: apodRes.status === 'fulfilled' ? apodRes.value.data : null,
         marsPhotos: marsRes.status === 'fulfilled' ? (marsRes.value.data.photos || []) : [],
         neoData: neoRes.status === 'fulfilled' ? neoRes.value.data : null,
-        epicImages: epicRes.status === 'fulfilled' ? (epicRes.value.data.images || epicRes.value.data || []) : [],
         stats: {
           totalImages: marsRes.status === 'fulfilled' ? (marsRes.value.data.total || marsRes.value.data.photos?.length || 0) : 0,
           activeRovers: 3,
@@ -114,13 +112,12 @@ const Dashboard = () => {
       if (apodRes.status === 'rejected') console.warn('APOD failed:', apodRes.reason);
       if (marsRes.status === 'rejected') console.warn('Mars data failed:', marsRes.reason);
       if (neoRes.status === 'rejected') console.warn('NEO data failed:', neoRes.reason);
-      if (epicRes.status === 'rejected') console.warn('EPIC data failed:', epicRes.reason);
 
-      // Detect if we're using fallback data
+      // Detect if we're using fallback data - check for fallback indicators
       const isFallback = 
-        (processedData.apod?.date === "2024-06-15" && processedData.apod?.title === "A Prominent Solar Filament") ||
-        (processedData.marsPhotos?.[0]?.id === 1000000) ||
-        (processedData.neoData?.asteroids_by_date?.["2024-06-15"]?.some(a => a.id === "54016112"));
+        processedData.apod?._isFallbackData ||
+        processedData.marsPhotos?._isFallbackData ||
+        processedData.neoData?._isFallbackData;
       
       setUsingFallbackData(isFallback);
       setDashboardData(processedData);
@@ -277,13 +274,6 @@ const Dashboard = () => {
               value: dashboardData.stats.nearEarthObjects,
               color: theme.palette.warning.main,
               trend: 'This Week',
-            },
-            {
-              icon: <Public sx={{ fontSize: 40 }} />,
-              label: 'Earth Images',
-              value: dashboardData.epicImages.length,
-              color: theme.palette.success.main,
-              trend: 'Latest',
             },
           ].map((stat, index) => (
             <Grid item xs={12} sm={6} md={3} key={index}>
@@ -602,13 +592,6 @@ const Dashboard = () => {
                     icon: <Warning />,
                     path: '/neo',
                     color: theme.palette.warning.main,
-                  },
-                  {
-                    title: 'Earth from Space',
-                    desc: 'View our planet from EPIC camera',
-                    icon: <Public />,
-                    path: '/earth',
-                    color: theme.palette.success.main,
                   },
                   {
                     title: 'Search Archives',

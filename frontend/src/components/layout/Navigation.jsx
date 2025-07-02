@@ -39,7 +39,6 @@ const Navigation = () => {
     { path: '/apod', label: 'APOD', icon: <CameraAlt /> },
     { path: '/mars', label: 'Mars', icon: <Rocket /> },
     { path: '/neo', label: 'Asteroids', icon: <Warning /> },
-    { path: '/earth', label: 'Earth', icon: <Public /> },
     { path: '/search', label: 'Search', icon: <Search /> },
   ];
 
