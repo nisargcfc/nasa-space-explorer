@@ -35,9 +35,11 @@ app.use(cors({
     'https://nasa-space-explorer-frontend.vercel.app',
     'https://nasa-space-explorer-frontend-6p47x1aod.vercel.app',
     'https://nasa-space-explorer-frontend-cyh0rsjui.vercel.app',
+    'https://nasa-space-explorer-frontend-ibtdt9vmp.vercel.app',
     process.env.FRONTEND_URL
   ].filter(Boolean),
-  credentials: true
+  credentials: true,
+  optionsSuccessStatus: 200
 }));
 app.use(compression()); // Compress responses
 app.use(express.json()); // Parse JSON bodies
